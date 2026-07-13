@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CompetitionListItem matches snapshot (default) 1`] = `
+<body>
+  <div>
+    <a
+      href="/competitions/123"
+    >
+      <li
+        class="link-card list-none flex flex-row cursor-pointer group hover-transition my-1 type-body opacity-50"
+      >
+        <div
+          class="flex flex-shrink mr-2 type-title"
+        >
+           
+          🇺🇸
+           
+        </div>
+        <div
+          class="flex-1"
+        >
+          <p
+            class="type-heading leading-1 dark:text-white"
+          >
+             
+            Test Competition
+             
+          </p>
+           
+          <p
+            class="type-body-sm text-muted leading-1"
+          >
+            Jan 1 – 2, 2024
+              
+            –
+              
+            New York
+          </p>
+        </div>
+      </li>
+    </a>
+  </div>
+</body>
+`;
+
+exports[`CompetitionListItem renders with all props (live and bookmarked) 1`] = `
+<body>
+  <div>
+    <a
+      href="/competitions/123"
+    >
+      <li
+        class="link-card list-none flex flex-row cursor-pointer group hover-transition my-1 type-body opacity-50"
+      >
+        <div
+          class="flex flex-shrink mr-2 type-title"
+        >
+           
+          🇺🇸
+           
+        </div>
+        <div
+          class="flex-1"
+        >
+          <p
+            class="type-heading leading-1 dark:text-white"
+          >
+             
+            Test Competition
+             
+          </p>
+           
+          <p
+            class="type-body-sm text-muted leading-1"
+          >
+            Jan 1 – 2, 2024
+              
+            –
+              
+            New York
+          </p>
+        </div>
+        <div
+          class="flex items-center flex-shrink px-2 type-title"
+        >
+          <span
+            class="text-green-500 fa fa-tower-broadcast"
+          />
+        </div>
+      </li>
+    </a>
+  </div>
+</body>
+`;

@@ -1,0 +1,269 @@
+/**
+ * Table Components & Utilities
+ * Comprehensive table styling system with consistent color tokens
+ */
+
+@layer utilities {
+  $table-header-bg-map: (
+    'header': 'bg-gray-200 dark:bg-gray-800',
+    'header-blue': 'bg-blue-200 dark:bg-blue-800',
+    'header-primary': 'bg-blue-200 dark:bg-blue-700',
+    'header-secondary': 'bg-green-200 dark:bg-green-900',
+  );
+
+  $table-row-bg-map: (
+    'row': 'bg-white dark:bg-gray-900',
+    'row-alt': 'bg-gray-50 dark:bg-gray-800',
+    'row-alt-primary': 'bg-blue-50 dark:bg-blue-900',
+    'row-alt-secondary': 'bg-green-50 dark:bg-green-900/60',
+  );
+
+  $table-row-hover-map: (
+    'row-hover': 'bg-gray-200 dark:bg-gray-600',
+    'row-hover-primary': 'bg-blue-100 dark:bg-blue-800',
+    'row-hover-secondary': 'bg-green-100 dark:bg-green-900',
+  );
+
+  @mixin table-bg-classes($map) {
+    @each $name, $classes in $map {
+      .table-bg-#{$name} {
+        @apply #{$classes};
+      }
+    }
+  }
+
+  @include table-bg-classes($table-header-bg-map);
+  @include table-bg-classes($table-row-bg-map);
+  @include table-bg-classes($table-row-hover-map);
+
+  /* Container utilities */
+  .table-container {
+    @apply border border-gray-300 rounded-md shadow-md dark:border-gray-700 dark:shadow-gray-800 print:shadow-none;
+  }
+
+  .table-container-light {
+    @apply shadow-sm dark:shadow-gray-800 print:shadow-none;
+  }
+
+  .table-container-full {
+    @apply overflow-x-auto;
+  }
+
+  .table-base {
+    @apply w-full bg-panel;
+  }
+
+  /* Header utilities */
+  .table-header {
+    @apply table-bg-header;
+  }
+
+  .table-header-blue {
+    @apply table-bg-header-blue;
+  }
+
+  .table-header-primary {
+    @apply table-bg-header-primary;
+  }
+
+  .table-header-secondary {
+    @apply table-bg-header-secondary;
+  }
+
+  .table-header-cell-sm {
+    @apply px-3 py-2 text-gray-900 dark:text-white type-label;
+  }
+
+  .table-header-cell {
+    @apply px-6 py-3 text-gray-900 dark:text-white type-label;
+  }
+
+  .table-header-cell-lg {
+    @apply px-8 py-4 text-gray-900 dark:text-white type-label;
+  }
+
+  .table-header-cell-sm-center {
+    @apply text-center table-header-cell-sm;
+  }
+
+  .table-header-cell-center {
+    @apply text-center table-header-cell;
+  }
+
+  .table-header-cell-lg-center {
+    @apply text-center table-header-cell-lg;
+  }
+
+  .table-row-group-header {
+    @apply px-3 py-2 font-bold text-center type-heading table-bg-header;
+  }
+
+  /* Cell utilities */
+  .table-cell-sm {
+    @apply px-3 py-2 text-gray-900 dark:text-white;
+  }
+
+  .table-cell {
+    @apply px-6 py-2.5 text-gray-900 dark:text-white;
+  }
+
+  .table-cell-lg {
+    @apply px-8 py-3.5 text-gray-900 dark:text-white;
+  }
+
+  .table-cell-sm-center {
+    @apply text-center table-cell-sm;
+  }
+
+  .table-cell-center {
+    @apply table-cell text-center;
+  }
+
+  .table-cell-lg-center {
+    @apply text-center table-cell-lg;
+  }
+
+  /* Row utilities */
+  .table-row-hover {
+    @apply transition-all cursor-pointer;
+  }
+
+  .table-row-hover:hover {
+    @apply table-bg-row-hover;
+  }
+
+  .table-row-link {
+    @apply table-row transition-all border-b cursor-pointer border-tertiary-weak;
+  }
+
+  .table-row-link:hover {
+    @apply table-bg-row-hover;
+  }
+
+  .table-row-hover-bg {
+    @apply hover-transition cursor-pointer;
+  }
+
+  .table-row-hover-bg:hover {
+    @apply table-bg-row-hover;
+  }
+
+  /* Border utilities */
+  .table-row-border-y {
+    @apply border-y border-tertiary-weak;
+  }
+
+  .table-row-border-b {
+    @apply border-b border-tertiary-weak;
+  }
+
+  .table-row-border-t {
+    @apply border-t border-tertiary-weak;
+  }
+
+  .table-bordered {
+    @apply border border-collapse border-tertiary-weak;
+  }
+
+  .table-bordered th,
+  .table-bordered td {
+    @apply border border-tertiary-weak;
+  }
+
+  /* Striped tables */
+  .table-striped tbody tr:nth-child(even),
+  .table-striped tbody .table-row-link:nth-child(even) {
+    @apply table-bg-row-alt;
+  }
+
+  .table-striped tbody tr:nth-child(odd),
+  .table-striped tbody .table-row-link:nth-child(odd) {
+    @apply table-bg-row;
+  }
+
+  .table-striped tbody tr:hover,
+  .table-striped tbody .table-row-link:hover {
+    @apply table-bg-row-hover;
+  }
+
+  .table-striped-primary tbody tr:nth-child(even),
+  .table-striped-primary tbody .table-row-link:nth-child(even) {
+    @apply table-bg-row-alt-primary;
+  }
+
+  .table-striped-primary tbody tr:nth-child(odd),
+  .table-striped-primary tbody .table-row-link:nth-child(odd) {
+    @apply table-bg-row;
+  }
+
+  .table-striped-primary tbody tr:hover,
+  .table-striped-primary tbody .table-row-link:hover {
+    @apply table-bg-row-hover-primary;
+  }
+
+  .table-striped-secondary tbody tr:nth-child(even),
+  .table-striped-secondary tbody .table-row-link:nth-child(even) {
+    @apply table-bg-row-alt-secondary;
+  }
+
+  .table-striped-secondary tbody tr:nth-child(odd),
+  .table-striped-secondary tbody .table-row-link:nth-child(odd) {
+    @apply table-bg-row;
+  }
+
+  .table-striped-secondary tbody tr:hover,
+  .table-striped-secondary tbody .table-row-link:hover {
+    @apply table-bg-row-hover-secondary;
+  }
+
+  /* Assignment-themed rows are generated by the Tailwind plugin */
+
+  /* Print utilities */
+  @media print {
+    .table-container {
+      @apply border-0 shadow-none print:text-xs;
+    }
+
+    .table-base {
+      @apply bg-transparent;
+    }
+
+    .table-header,
+    .table-header-blue,
+    .table-header-primary,
+    .table-header-secondary {
+      @apply bg-transparent;
+    }
+
+    .table-row-group-header {
+      @apply bg-transparent;
+    }
+
+    .table-striped tbody tr:nth-child(even),
+    .table-striped tbody .table-row-link:nth-child(even),
+    .table-striped tbody tr:nth-child(odd),
+    .table-striped tbody .table-row-link:nth-child(odd) {
+      @apply bg-transparent;
+    }
+
+    .table-striped-primary tbody tr,
+    .table-striped-primary tbody .table-row-link,
+    .table-striped-secondary tbody tr,
+    .table-striped-secondary tbody .table-row-link {
+      @apply bg-transparent;
+    }
+
+    .table-bordered,
+    .table-bordered th,
+    .table-bordered td {
+      @apply border-0;
+    }
+
+    .table-row-border-y,
+    .table-row-border-b,
+    .table-row-border-t,
+    .table-row-link {
+      @apply border-0;
+    }
+  }
+}

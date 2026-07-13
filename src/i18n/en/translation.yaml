@@ -1,0 +1,278 @@
+common:
+  appName: 'Competition Groups'
+  wca:
+    event: 'Event'
+    round: 'Round'
+    group: 'Group'
+    group_other: 'Groups'
+    attempt: 'Attempt'
+    events:
+      '333': '3x3x3 Cube'
+      '222': '2x2x2 Cube'
+      '444': '4x4x4 Cube'
+      '555': '5x5x5 Cube'
+      '666': '6x6x6 Cube'
+      '777': '7x7x7 Cube'
+      '333bf': '3x3x3 Blindfolded'
+      '333fm': '3x3x3 Fewest Moves'
+      '333oh': '3x3x3 One-Handed'
+      '333ft': '3x3x3 With Feet'
+      'clock': 'Clock'
+      'minx': 'Megaminx'
+      'pyram': 'Pyraminx'
+      'skewb': 'Skewb'
+      'sq1': 'Square-1'
+      '444bf': '4x4x4 Blindfolded'
+      '555bf': '5x5x5 Blindfolded'
+      '333mbf': '3x3x3 Multi-Blind'
+      'other-mbld': 'MBLD Submission'
+    timeLimit: 'Time Limit'
+    cutoff: 'Cutoff'
+    cumulativeTimelimit: 'Time Limit: <b>{{time}} Cumulative</b>'
+    cumulativeTimelimitWithrounds: 'Time Limit: <b>{{time}} Total</b> with: '
+    advancement:
+      ranking: 'Top {{level}} advance to {{what}}'
+      percent: 'Top {{level}}% advance to {{what}}'
+      linkedRanking: 'Top {{level}} in dual rounds {{rounds}} advance to {{what}}'
+      linkedPercent: 'Top {{level}}% in dual rounds {{rounds}} advance to {{what}}'
+      attemptResult: Result better than <b>{level}</b> advances to next round. Minimum of 25% of competitors must be eliminated.
+      resultAchieved: '{{scope}} < {{result}} advance to {{what}}; minimum of 25% of competitors must be eliminated'
+      linkedResultAchieved: '{{scope}} < {{result}} in dual rounds {{rounds}} advance to {{what}}; minimum of 25% of competitors must be eliminated'
+      resultThresholdUnknown: an unknown result
+      nextRound: next round
+      final: final
+      unknown: unknown
+      scope:
+        single: Singles
+        average: Averages
+    resultType:
+      single: single
+      average: Average
+    recordType:
+      WR: WR
+      CR: CR
+      NR: NR
+  cutoffTimeLimitPopover:
+    timeLimits: <b>Time limits</b> are established for all rounds, applying to each individual solve. Solves that exceed the limit will be marked as "DNF" and the time will not count.
+    cutoffs: Each round may include <bold>cutoffs</bold>, which dictate whether a competitor is eligible to complete all their attempts to finish their average. To qualify, they must achieve a time within the cutoff time during their initial solve or within their first two solves.
+    cutoff: This round requires the condition met in the first attempt
+    cutoff_other: This round requires the condition met in the first {{count}} attempts
+    advancement:
+      At least 25% of competitors must be eliminated before progressing to the next round. The
+      organizing team will establish advancement criteria for each round, but adjustments may
+      be necessary to ensure this minimum elimination threshold is met.
+  activityCodeToName:
+    round: '$t(common.wca.round) {{roundNumber}}'
+    group: '$t(common.wca.group) {{groupNumber}}'
+    attempt: '$t(common.wca.attempt) {{attemptNumber}}'
+  assignments:
+    competitor:
+      noun: Competitor
+      noun_other: Competitors
+      verb: Competing
+    staff-judge:
+      noun: Judge
+      noun_other: Judges
+      verb: Judging
+    staff-runner:
+      noun: Runner
+      noun_other: Runners
+      verb: Running
+    staff-scrambler:
+      noun: Scrambler
+      noun_other: Scramblers
+      verb: Scrambling
+    staff-delegate:
+      noun: Delegate
+      noun_other: Delegates
+      verb: Delegating
+    staff-stream:
+      noun: Livestream
+      noun_other: Livestream
+      verb: Streaming
+    staff-photo:
+      noun: Photographer
+      noun_other: Photographers
+      verb: Photographing
+    staff-dataentry:
+      noun: Data Entry
+      noun_other: Data Entry
+      verb: Entering Data
+    staff-announcer:
+      noun: Announcer
+      noun_other: Announcers
+      verb: Announcing
+    staff-stagelead:
+      noun: Stage Lead
+      noun_other: Stage Leads
+      verb: In charge
+    staff-showrunner:
+      noun: Showrunner
+      noun_other: Showrunners
+      verb: Running the show
+    staff-other:
+      noun: Staff
+      noun_other: Staff
+      verb: Staff
+    staff-break:
+      noun: Break
+      noun_other: Breaks
+      verb: On break
+    staff-lunch:
+      noun: Lunch
+      noun_other: Lunches
+      verb: On lunch
+    staff-setupteardown:
+      noun: Setup/Teardown
+      noun_other: Setup/Teardowns
+      verb: Setting up/tearing down
+    staff-core:
+      noun: Core Staff
+      noun_other: Core Staff
+      verb: Core Staff
+  lastFetched: 'Last fetched: {{date}}'
+  competitionSelect:
+    placeholder: 'Search Competitions'
+    noOptions: 'No competitions found'
+  competitionList:
+    noneFound: 'No competitions found.'
+  loading: 'Loading...'
+  search: 'Search'
+  view: 'View'
+  close: Close
+  name: Name
+  stage: Stage
+  login: 'Login'
+appUpdate:
+  title: 'New update available!'
+  description: 'Refresh to get the latest version of the app.'
+  action: 'Refresh now'
+header:
+  login: $t(common.login)
+  logout: 'Logout'
+  tabs:
+    groups: 'Groups'
+    events: 'Events'
+    schedule: 'Schedule'
+    rankings: 'Rankings'
+    results: 'Results'
+    scramblers: 'Scramblers'
+    stream: 'Stream'
+    admin: 'Admin'
+    sumOfRanks: 'Sum of Rankings'
+    stats: 'Stats'
+home:
+  subtitle: 'Learn all you need about your WCA competition assignments!'
+  explanation: 'Note: This site is a convenience tool for organizers, delegates, and competitors. It uses scheduled data, so check with organizers for the latest details. Start and end times may change.'
+  learnMore: 'How does this site work?'
+  support: 'Keep the lights on'
+  loggedOutCard:
+    eyebrow: 'Personalized view'
+    title: 'Log in to see your competitions'
+    description: 'Sign in with your WCA account to load your competition list and personalized schedule'
+  loadingMore: 'Loading more...'
+  myCompetitions: 'My Competitions'
+  upcomingCompetitions: 'Upcoming Competitions'
+  yourCompetitions: 'Your Competitions'
+competition:
+  competitors:
+    viewMyAssignments: 'View My Assignments'
+    viewCompetitionInformation: 'View Competition Information'
+    searchCompetitors: 'Search Competitors'
+  groups:
+    backToEvents: 'Back to Events'
+    nextGroup: 'Next Group'
+    previousGroup: 'Previous Group'
+  rooms:
+    title: 'Rooms'
+  room:
+    back: 'Back to list of Rooms'
+  schedule:
+    title: Schedule
+    selectRoom: 'Select Room'
+  eventActivity:
+    seedResult: Seed Result
+    stationNumber: Station Number
+  rankings:
+    title: Rankings
+    name: Name
+  results:
+    title: Results
+    seeResults: See Results
+    back: Back
+    roundNotFound: Round not found.
+    noResults: No results yet.
+    rank: '#'
+    competitor: Competitor
+    average: Avg
+    best: Best
+    attempts: Attempts
+    unknownCompetitor: 'Competitor #{{personId}}'
+    allResults: All results
+    viewLiveResults: View live results
+    resultsSourceNote: Results are merged from WCIF and WCA Live when available. WCA Live data may be delayed.
+  personalResults:
+    eventResults: Event results
+  round:
+    linkedWith: 'Dual round with {{rounds}}'
+  personalSchedule:
+    schedule: Schedule
+    results: Results
+    records: Records
+    registeredEvents: Registered Events
+    viewPersonalRecords: View Personal Records
+    viewResults: View Results
+    viewWcaLiveResults: View WCA Live Results
+    noAssignments:
+      line1: No Assignments
+      line2: Check back later for updates!
+    activity: Activity
+    time: Time
+    assignment: Assignment
+    group: Group
+    stage: $t(common.stage)
+    station: Station
+    submitMultiCubes: Submit Multi Cubes
+  customAssignmentColors:
+    summary: Custom assignment colors
+    description: Choose how custom roles appear for you. These colors are saved in your browser and do not affect other users.
+  personalRecords:
+    viewSchedule: View Personal Assignments
+    type: Type
+    best: Best
+  scramblers:
+    title: Scrambler Schedule
+    rooms: Rooms
+    stage: $t(common.stage)
+    event: Event
+    scramblers: Scramblers
+  streamSchedule:
+    title: Stream Schedule
+    subtitle: Live Stream
+    time: Time
+    event: $t(common.wca.event)
+    round: $t(common.wca.round)
+    group: $t(common.wca.group)
+    stage: $t(common.stage)
+    featuredCompetitors: Featured Competitors
+about:
+  title: About
+  welcome: Welcome to CompetitionGroups.com!
+  purpose: This purpose of this website is to show WCA competition assignments. This site can show
+    competing and staff assignments for competitions with 1 room or more for 1 day or
+    multiday competitions updating with all of the competition's next round
+    assignments. This site simply presents the assignments *as-is* from how they are, as
+    stored on the WCA website.
+  startTimes:
+    Start times and end times are taken straight from the WCIF data as generated, rounded to
+    the nearest 5 minutes, and converted to the respective venue's timezones.
+  competitionAssignments:
+    To get your competition's assignments to show here, you must generate them with a
+    tool like <3 to="https://groupifier.jonatanklosko.com/">Groupifier</3>,
+    <6 to="https://delegate-dashboard.netlify.app/">DelegateDashboard</6>, or
+    <9 to="https://goosly.github.io/AGE/">AGE</9>.
+  developer: If you are a developer and you want to learn more about the data that is shown here, check out the <2 to="https://github.com/thewca/wcif/blob/master/specification.md">WCIF specification</2>.
+  peopleCanBe:
+    People can be assigned to groups, rounds, or any arbitrary activity. If you want to get
+    creative with the website, feel free to <2 to="https://github.com/coder13">reach out to me</2>!
+disclaimerText: Start times are subject to change and may run ahead or behind schedule. Check with competition organizers for updates.

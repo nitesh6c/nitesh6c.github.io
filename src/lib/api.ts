@@ -1,0 +1,135 @@
+import { Competition } from '@wca/helpers';
+import { WCA_ORIGIN } from './wca-env';
+import { getStoredWcaAccessToken } from './wcaAccessToken';
+
+export const wcaApiFetch = async <T>(path: string, fetchOptions: RequestInit = {}) => {
+  const res = await fetch(`${WCA_ORIGIN}${path}`, fetchOptions);
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(error);
+  }
+
+  return (await res.json()) as T;
+};
+
+export const fetchMe = async (
+  accessToken: string,
+  params: {
+    upcoming_competitions?: boolean;
+    ongoing_competitions?: boolean;
+  } = {},
+) => {
+  const urlParams = new URLSearchParams({
+    upcoming_competitions: params.upcoming_competitions ? 'true' : 'false',
+    ongoing_competitions: params.ongoing_competitions ? 'true' : 'false',
+  });
+
+  return wcaApiFetch<{
+    me: User;
+    ongoing_competitions?: ApiCompetition[];
+    upcoming_competitions?: ApiCompetition[];
+  }>(`/me?${urlParams}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+};
+
+export const fetchUser = async (userId: string) => wcaApiFetch<{ user: User }>(`/users/${userId}`);
+
+const fetchUserWithCompetitionsParams = new URLSearchParams({
+  upcoming_competitions: 'true',
+  ongoing_competitions: 'true',
+});
+
+export interface UserCompsResponse {
+  user: User;
+  upcoming_competitions: ApiCompetition[];
+  ongoing_competitions: ApiCompetition[];
+}
+
+export const fetchUserWithCompetitions = async (userId: string) =>
+  wcaApiFetch<UserCompsResponse>(`/users/${userId}?${fetchUserWithCompetitionsParams.toString()}`);
+
+export const fetchWcif = async (competitionId: string) => {
+  const token = getStoredWcaAccessToken();
+  if (token) {
+    try {
+      return await wcaApiFetch<Competition>(`/competitions/${competitionId}/wcif`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (err) {
+      console.warn('Failed to fetch authenticated WCIF, falling back to public:', err);
+    }
+  }
+  return wcaApiFetch<Competition>(`/competitions/${competitionId}/wcif/public`);
+};
+
+export const patchWcif = async (competitionId: string, partialWcif: Partial<Competition>) => {
+  const token = getStoredWcaAccessToken();
+  if (!token) {
+    throw new Error('Not authenticated');
+  }
+
+  return wcaApiFetch<Competition>(`/competitions/${competitionId}/wcif`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(partialWcif),
+  });
+};
+
+export interface WcaCompetitionResult {
+  id: number;
+  pos: number;
+  best: number;
+  average: number;
+  name: string;
+  country_iso2: string;
+  competition_id: string;
+  event_id: string;
+  round_type_id: string;
+  format_id: string;
+  wca_id: string | null;
+  attempts: number[];
+  best_index?: number | null;
+  worst_index?: number | null;
+  regional_single_record?: string | null;
+  regional_average_record?: string | null;
+}
+
+export type WcaPersonCompetition = Pick<
+  ApiCompetition,
+  | 'id'
+  | 'name'
+  | 'short_name'
+  | 'city'
+  | 'country_iso2'
+  | 'start_date'
+  | 'end_date'
+  | 'announced_at'
+  | 'cancelled_at'
+  | 'latitude_degrees'
+  | 'longitude_degrees'
+  | 'venue_address'
+  | 'venue_details'
+  | 'website'
+>;
+
+export const fetchCompetitionResults = async (competitionId: string) =>
+  wcaApiFetch<WcaCompetitionResult[]>(`/competitions/${competitionId}/results`);
+
+export const fetchPersonCompetitions = async (wcaId: string) =>
+  wcaApiFetch<WcaPersonCompetition[]>(`/persons/${wcaId}/competitions`);
+
+export const fetchCompetition = async (competitionId: string) =>
+  await wcaApiFetch<ApiCompetition>(`/competitions/${competitionId}`);
+
+export const fetchSearchCompetition = (search: string) =>
+  wcaApiFetch<{ result: ApiCompetition[] }>(`/search/competitions?q=${search}`);

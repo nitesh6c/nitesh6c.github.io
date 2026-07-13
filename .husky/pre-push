@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Git for Windows hooks use a minimal PATH; Node is often missing.
+case "$(uname -s 2>/dev/null)" in
+  MINGW* | MSYS*)
+    export PATH="$PATH:/c/Program Files/nodejs"
+    ;;
+esac
+
+if command -v yarn >/dev/null 2>&1; then
+  yarn lint && yarn check:type && yarn test
+else
+  npm run lint && npm run check:type && npm run test
+fi

@@ -1,0 +1,126 @@
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Breadcrumbs } from '@/components/Breadcrumbs/Breadcrumbs';
+import { Container } from '@/components/Container';
+import { CutoffTimeLimitPanel } from '@/components/CutoffTimeLimitPanel';
+import { LinkButton } from '@/components/LinkButton';
+import {
+  activityCodeToName,
+  parseActivityCodeFlexible,
+  toRoundAttemptId,
+} from '@/lib/activityCodes';
+import { getAllEvents } from '@/lib/events';
+import { AnchorLink, LinkRenderer } from '@/lib/linkRenderer';
+import { activityCodeToRoundName, getEventRoundsForRound, joinLabels } from '@/lib/roundLabels';
+import { formatDateTimeRange } from '@/lib/time';
+import { getAdvancementConditionForRound } from '@/lib/wcif';
+import { useWCIF, useWcifUtils } from '@/providers/WCIFProvider';
+
+export interface CompetitionRoundContainerProps {
+  competitionId: string;
+  roundId: string;
+  LinkComponent?: LinkRenderer;
+}
+
+export function CompetitionRoundContainer({
+  competitionId,
+  roundId,
+  LinkComponent = AnchorLink,
+}: CompetitionRoundContainerProps) {
+  const { t } = useTranslation();
+  const { wcif, setTitle } = useWCIF();
+  const { roundActivies } = useWcifUtils();
+
+  useEffect(() => {
+    setTitle(activityCodeToName(roundId));
+  }, [roundId, setTitle]);
+
+  const round = useMemo(() => {
+    const events = wcif && getAllEvents(wcif);
+    return events?.flatMap((e) => e.rounds).find((r) => r.id === roundId);
+  }, [roundId, wcif]);
+  const eventRounds = useMemo(
+    () => getEventRoundsForRound(wcif?.events, roundId),
+    [roundId, wcif?.events],
+  );
+  const advancement = useMemo(
+    () => (round ? getAdvancementConditionForRound(eventRounds, round) : null),
+    [eventRounds, round],
+  );
+  const linkedRoundNames = useMemo(() => {
+    if (!advancement || advancement.sourceType !== 'linkedRounds') {
+      return [];
+    }
+
+    return advancement.sourceRoundIds
+      .filter((sourceRoundId) => sourceRoundId !== roundId)
+      .map((sourceRoundId) => activityCodeToRoundName(t, sourceRoundId));
+  }, [advancement, roundId, t]);
+
+  const rounds = roundActivies.filter((ra) => toRoundAttemptId(ra.activityCode) === roundId);
+  const groups = rounds.flatMap((r) => r.childActivities);
+  const uniqueGroupCodes = [...new Set(groups.map((g) => g.activityCode))];
+  const hasResults = (round?.results.length ?? 0) > 0;
+
+  return (
+    <Container>
+      <div className="space-y-2 p-2 type-body">
+        <Breadcrumbs
+          LinkComponent={LinkComponent}
+          breadcrumbs={[
+            {
+              label: activityCodeToName(roundId) || t('competition.groups.allGroups'),
+            },
+          ]}
+        />
+        <div className="flex flex-col space-y-1">
+          {linkedRoundNames.length > 0 && (
+            <p className="type-meta text-muted">
+              {t('competition.round.linkedWith', { rounds: joinLabels(linkedRoundNames) })}
+            </p>
+          )}
+          {round && <CutoffTimeLimitPanel round={round} />}
+        </div>
+      </div>
+      <ul className="flex flex-col space-y-2 p-2">
+        {uniqueGroupCodes.map((value) => {
+          const { groupNumber } = parseActivityCodeFlexible(value);
+          const activities = groups.filter((g) => g.activityCode === value);
+          const minStartTime = activities.map((a) => a.startTime).sort()[0];
+          const maxEndTime = activities.map((a) => a.endTime).sort()[activities.length - 1];
+
+          return (
+            <LinkComponent
+              key={value}
+              to={`/competitions/${competitionId}/events/${roundId}/${groupNumber}`}
+              className="flex flex-row list-none rounded-md border border-tertiary bg-tertiary px-3 py-2 hover-transition hover:bg-tertiary-strong group dark:text-white">
+              <li className="flex flex-col">
+                <span className="type-heading">
+                  {t('common.activityCodeToName.group', { groupNumber })}
+                </span>
+                <span className="type-meta">{formatDateTimeRange(minStartTime, maxEndTime)}</span>
+              </li>
+            </LinkComponent>
+          );
+        })}
+      </ul>
+      {round && (
+        <div className="space-y-2 p-2">
+          <LinkButton
+            to={`/competitions/${competitionId}/results/${roundId}`}
+            title={t('competition.results.seeResults')}
+            variant={hasResults ? 'green' : 'light'}
+            LinkComponent={LinkComponent}
+          />
+        </div>
+      )}
+      <div className="p-2">
+        <LinkButton
+          to={`/competitions/${competitionId}/events/`}
+          title={t('competition.groups.backToEvents')}
+          LinkComponent={LinkComponent}
+        />
+      </div>
+    </Container>
+  );
+}

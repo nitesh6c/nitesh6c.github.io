@@ -1,0 +1,101 @@
+import { Competition } from '@wca/helpers';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useCollapse } from '@/hooks/UseCollapse';
+import { getScheduledDays, hasMultipleScheduleLocations } from '@/lib/activities';
+import { LinkRenderer } from '@/lib/linkRenderer';
+import { ActivityWithRoomOrParent } from '@/lib/types';
+import { ScheduleActivityRow } from './ScheduleActivityRow';
+import { getScheduleActivityGroups } from './scheduleActivityGroups';
+
+const key = (compId: string) => `${compId}-schedule`;
+
+const ScheduleDay = ({
+  wcif,
+  date,
+  activities,
+  showRoom,
+  LinkComponent,
+}: {
+  wcif;
+  date: string;
+  activities: ActivityWithRoomOrParent[];
+  showRoom: boolean;
+  LinkComponent?: LinkRenderer;
+}) => {
+  const { collapsedDates, toggleDate } = useCollapse(key(wcif.id));
+  const activityGroups = useMemo(
+    () => getScheduleActivityGroups(wcif, activities),
+    [activities, wcif],
+  );
+
+  const collapsed = collapsedDates.includes(date);
+  const toggleCollapsed = useCallback(() => {
+    toggleDate(date);
+  }, [date, toggleDate]);
+
+  return (
+    <div className="flex flex-col">
+      <div
+        className="w-full text-center bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-default font-bold type-heading mb-1 select-none cursor-pointer h-10 hover-transition"
+        onClick={() => toggleCollapsed()}>
+        <span>{date}</span>
+        <span className="p-2 flex-end">{collapsed ? ' ▼' : ' ▲'}</span>
+      </div>
+      <div className="flex flex-col">
+        {(collapsed ? [] : activityGroups).map((group) => (
+          <ScheduleActivityRow
+            key={group.id}
+            group={group}
+            LinkComponent={LinkComponent}
+            showRoom={showRoom}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export interface ScheduleContainerProps {
+  wcif: Competition;
+  LinkComponent?: LinkRenderer;
+}
+
+export const ScheduleContainer = ({ wcif, LinkComponent }: ScheduleContainerProps) => {
+  const { collapsedDates, setCollapsedDates } = useCollapse(key(wcif.id));
+
+  const scheduleDays = useMemo(() => getScheduledDays(wcif), [wcif]);
+
+  useEffect(() => {
+    const now = new Date().getTime();
+
+    const collapse = new Set(collapsedDates);
+    scheduleDays.forEach(({ date, activities }) => {
+      const lastActivityEndTime = Math.max(...activities.map((i) => new Date(i.endTime).getTime()));
+
+      // Collapse days that are more than 4 hours old.
+      if (now - new Date(lastActivityEndTime).getTime() > 1000 * 60 * 60 * 4) {
+        collapse.add(date);
+      }
+    });
+
+    setCollapsedDates([...collapse]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheduleDays]);
+
+  const showRoom = useMemo(() => hasMultipleScheduleLocations(wcif), [wcif]);
+
+  return (
+    <div>
+      {scheduleDays.map(({ date, activities }) => (
+        <ScheduleDay
+          key={date}
+          wcif={wcif}
+          activities={activities}
+          date={date}
+          showRoom={showRoom}
+          LinkComponent={LinkComponent}
+        />
+      ))}
+    </div>
+  );
+};

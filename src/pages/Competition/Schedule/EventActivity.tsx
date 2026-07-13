@@ -1,0 +1,380 @@
+import { Activity, AssignmentCode, Person } from '@wca/helpers';
+import classNames from 'classnames';
+import { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { Breadcrumbs } from '@/components/Breadcrumbs/Breadcrumbs';
+import { CutoffTimeLimitPanel } from '@/components/CutoffTimeLimitPanel';
+import { getRoomData, getRooms } from '@/lib/activities';
+import { parseActivityCodeFlexible } from '@/lib/activityCodes';
+import { getAllEvents, isOfficialEventId, isRankedBySingle } from '@/lib/events';
+import { LinkRenderer } from '@/lib/linkRenderer';
+import { renderResultByEventId } from '@/lib/results';
+import { formatDateTimeRange } from '@/lib/time';
+import { useWCIF } from '@/providers/WCIFProvider';
+import { niceActivityName } from './Activity';
+import { PeopleList } from './PeopleList';
+
+const isAssignment = (assignment) => (a) =>
+  a.assignments.some(({ assignmentCode }) => assignmentCode === assignment);
+
+interface EventGroupProps {
+  competitionId: string;
+  activity: Activity;
+  persons: Person[];
+  LinkComponent?: LinkRenderer;
+  onNavigate?: (to: string) => void;
+}
+
+export function EventActivity({
+  competitionId,
+  activity,
+  persons,
+  LinkComponent = Link,
+  onNavigate,
+}: EventGroupProps) {
+  const { t } = useTranslation();
+
+  const { setTitle, wcif } = useWCIF();
+  const { eventId, roundNumber } = parseActivityCodeFlexible(activity?.activityCode || '');
+  const event = useMemo(
+    () => wcif && getAllEvents(wcif).find((e) => e.id === eventId),
+    [eventId, wcif],
+  );
+
+  const round = useMemo(() => {
+    if (!event) {
+      return null;
+    }
+
+    return event.rounds?.find((r) => r.id === `${eventId}-r${roundNumber}`);
+  }, [event, eventId, roundNumber]);
+
+  const prevRound = useMemo(
+    () => roundNumber && event?.rounds?.find((r) => r.id === `${eventId}-r${roundNumber - 1}`),
+    [event?.rounds, eventId, roundNumber],
+  );
+
+  useEffect(() => {
+    if (activity) {
+      setTitle(niceActivityName(activity));
+    }
+  }, [activity, setTitle]);
+
+  const room = useMemo(
+    () =>
+      wcif &&
+      getRooms(wcif).find((r) =>
+        r.activities.some(
+          (a) => a.id === activity.id || a?.childActivities?.some((ca) => ca.id === activity.id),
+        ),
+      ),
+    [activity.id, wcif],
+  );
+
+  const roomData = useMemo(() => {
+    if (!room) {
+      return undefined;
+    }
+
+    return getRoomData(room, activity);
+  }, [activity, room]);
+
+  const venue = wcif?.schedule.venues?.find((v) => v.rooms.some((r) => r.id === room?.id));
+  const timeZone = venue?.timezone;
+
+  const personsWithPRs = useMemo(
+    () =>
+      persons.map((person) => ({
+        ...person,
+        prSingle: person.personalBests?.find(
+          (pb) => pb.eventId === eventId && pb.type === 'single',
+        ),
+        prAverage: person.personalBests?.find(
+          (pb) => pb.eventId === eventId && pb.type === 'average',
+        ),
+      })),
+    [persons, eventId],
+  );
+
+  const competitors = personsWithPRs.filter(isAssignment('competitor'));
+
+  const assignments = new Set(
+    personsWithPRs.map((person) => person.assignments?.map((a) => a.assignmentCode)).flat(),
+  );
+
+  const peopleByAssignmentCode = (Array.from(assignments.values()) as AssignmentCode[])
+    .filter((assignmentCode) => assignmentCode !== 'competitor')
+    .reduce((acc, assignmentCode) => {
+      acc[assignmentCode] = personsWithPRs.filter(isAssignment(assignmentCode));
+      return acc;
+    }, {}) as Record<AssignmentCode, Person[]>;
+
+  const seedResult = useCallback(
+    (person) => {
+      if (!isOfficialEventId(eventId)) {
+        return '';
+      }
+
+      if (prevRound) {
+        const prevRoundResults = prevRound.results?.find(
+          (r) => r.personId?.toString() === person.registrantId?.toString(),
+        );
+        if (!prevRoundResults) {
+          return '';
+        }
+
+        if (['a', 'm'].includes(prevRound.format)) {
+          return renderResultByEventId(eventId, 'average', prevRoundResults.average);
+        }
+
+        return renderResultByEventId(eventId, 'single', prevRoundResults.best);
+      }
+
+      const averagePr = person.prAverage?.best;
+      const singlePr = person.prSingle?.best;
+      const shouldShowAveragePr = !isRankedBySingle(eventId);
+      if ((shouldShowAveragePr && !averagePr) || !singlePr) {
+        return '';
+      }
+
+      return renderResultByEventId(
+        eventId,
+        shouldShowAveragePr ? 'average' : 'single',
+        shouldShowAveragePr ? averagePr : singlePr,
+      );
+    },
+    [eventId, prevRound],
+  );
+
+  const seedRank = useCallback(
+    (person) => {
+      if (!isOfficialEventId(eventId)) {
+        return '';
+      }
+
+      if (prevRound) {
+        const prevRoundResults = prevRound.results?.find(
+          (r) => r.personId?.toString() === person.registrantId?.toString(),
+        );
+        if (!prevRoundResults) {
+          return '';
+        }
+
+        return prevRoundResults.ranking;
+      }
+
+      const averagePr = person.prAverage;
+      const singlePr = person.prSingle;
+      const shouldShowAveragePr = !isRankedBySingle(eventId);
+      if ((shouldShowAveragePr && !averagePr) || !singlePr) {
+        return '';
+      }
+
+      if (averagePr) {
+        return averagePr.worldRanking;
+      }
+
+      return singlePr.worldRanking;
+    },
+    [eventId, prevRound],
+  );
+
+  const stationNumber = (assignmentCode) => (person) => {
+    const assignment = person.assignments.find(
+      (a) => a.assignmentCode === assignmentCode && a.activityId === activity.id,
+    );
+    return assignment?.stationNumber;
+  };
+
+  const anyCompetitorHasStationNumber = competitors.some(stationNumber('competitor'));
+
+  const activityName = niceActivityName(activity);
+
+  const groupNumber = parseActivityCodeFlexible(activity.activityCode).groupNumber;
+
+  const allActivitiesInStage = useMemo(
+    () =>
+      room?.activities
+        .flatMap((i) => i.childActivities)
+        .filter((i) => {
+          const stage = getRoomData(room, i);
+          if (stage && roomData) {
+            return stage?.name === roomData?.name;
+          }
+
+          return true;
+        })
+        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime()),
+    [room, roomData],
+  );
+
+  const currentIndex = useMemo(() => {
+    return allActivitiesInStage?.findIndex((i) => i.id === activity.id);
+  }, [activity.id, allActivitiesInStage]);
+
+  const prev = useMemo(
+    () =>
+      allActivitiesInStage && currentIndex !== undefined
+        ? allActivitiesInStage[currentIndex - 1]
+        : undefined,
+    [allActivitiesInStage, currentIndex],
+  );
+  const next = useMemo(
+    () =>
+      allActivitiesInStage && currentIndex !== undefined
+        ? allActivitiesInStage[currentIndex + 1]
+        : undefined,
+    [allActivitiesInStage, currentIndex],
+  );
+
+  const prevUrl = prev && `/competitions/${competitionId}/activities/${prev?.id}`;
+  const nextUrl = next && `/competitions/${competitionId}/activities/${next?.id}`;
+
+  const goToPrev = useCallback(() => {
+    if (prevUrl) {
+      onNavigate?.(prevUrl);
+    }
+  }, [onNavigate, prevUrl]);
+
+  const goToNext = useCallback(() => {
+    if (nextUrl) {
+      onNavigate?.(nextUrl);
+    }
+  }, [onNavigate, nextUrl]);
+
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        goToPrev();
+      }
+
+      if (event.key === 'ArrowRight') {
+        goToNext();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeydown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeydown);
+    };
+  }, [wcif, activity, goToPrev, goToNext]);
+
+  return (
+    <>
+      {wcif && (
+        <div className="p-2 space-y-2 type-body">
+          <Breadcrumbs
+            LinkComponent={LinkComponent}
+            breadcrumbs={[
+              {
+                href: `/competitions/${wcif.id}/rooms/${room?.id}`,
+                label: roomData?.name || '',
+                pillProps: { style: { backgroundColor: `${roomData?.color}70` } },
+              },
+              ...(round
+                ? [
+                    {
+                      href: `/competitions/${wcif.id}/events/${round.id}/${groupNumber}`,
+                      label: activityName,
+                    },
+                  ]
+                : [
+                    {
+                      label: activityName,
+                    },
+                  ]),
+            ]}
+          />
+          <div className="flex space-x-2 type-body">
+            <LinkComponent
+              to={prevUrl || ''}
+              className={classNames(
+                'w-full border border-tertiary-weak rounded-md p-2 px-2 flex cursor-pointer hover-transition my-1 justify-end',
+                {
+                  'pointer-events-none opacity-25': !prev,
+                  'hover:bg-gray-100 dark:hover:bg-gray-700 group cursor-pointer': prev,
+                },
+              )}>
+              <span className="self-center mr-2 transition-all fa fa-arrow-left group-hover:-translate-x-2" />
+              {t('competition.groups.previousGroup')}
+            </LinkComponent>
+            <LinkComponent
+              to={nextUrl || ''}
+              className={classNames(
+                'w-full border border-tertiary-weak rounded-md p-2 px-2 flex cursor-pointer group hover:bg-gray-100 dark:hover:bg-gray-700 hover-transition my-1',
+                {
+                  'pointer-events-none opacity-25': !next,
+                  'hover:bg-gray-100 dark:hover:bg-gray-700 group': next,
+                },
+              )}>
+              {t('competition.groups.nextGroup')}
+              <span className="self-center ml-2 transition-all fa fa-arrow-right group-hover:translate-x-2" />
+            </LinkComponent>
+          </div>
+
+          <div className="space-y-1">
+            <span className="px-2 type-meta">
+              {formatDateTimeRange(activity.startTime, activity.endTime, 5, timeZone)}
+            </span>
+            {round && <CutoffTimeLimitPanel round={round} className="w-full" />}
+          </div>
+        </div>
+      )}
+      <hr className="mb-2 border-t border-tertiary-weak" />
+      {competitors.length > 0 && (
+        <div>
+          <h4 className="px-6 py-3 pb-1 type-heading text-center bg-green-200 shadow-md dark:bg-green-900/60 dark:text-white">
+            {t('common.assignments.competitor.noun')}{' '}
+            <span className="type-body-sm">({competitors.length})</span>
+          </h4>
+          <table className="table-base text-left type-body">
+            <thead>
+              <tr className="bg-green-200 shadow-md dark:bg-green-900/60 dark:shadow-gray-800/40">
+                <th className="table-header-cell">{t('common.name')}</th>
+                <th className="table-header-cell">{t('competition.eventActivity.seedResult')}</th>
+                {anyCompetitorHasStationNumber && (
+                  <th className="table-header-cell">
+                    {t('competition.eventActivity.stationNumber')}
+                  </th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {competitors
+                .map((person) => ({
+                  ...person,
+                  seedResult: seedResult(person),
+                  seedRank: seedRank(person),
+                }))
+                .sort((a, b) => {
+                  return (a.seedRank || 999999999) - (b.seedRank || 999999999);
+                })
+                .map((person) => (
+                  <LinkComponent
+                    key={person.registrantId}
+                    className="table-row table-row-hover even:bg-green-50 dark:bg-gray-900 even:dark:bg-green-900/50"
+                    to={`/competitions/${competitionId}/persons/${person.registrantId}`}>
+                    <td className="table-cell type-body-sm">{person.name}</td>
+                    <td className="table-cell type-body-sm">{person.seedResult}</td>
+                    {anyCompetitorHasStationNumber && (
+                      <td className="table-cell type-body-sm">
+                        {stationNumber('competitor')(person)}
+                      </td>
+                    )}
+                  </LinkComponent>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <PeopleList
+        competitionId={competitionId}
+        activity={activity}
+        LinkComponent={LinkComponent}
+        peopleByAssignmentCode={peopleByAssignmentCode}
+      />
+    </>
+  );
+}
